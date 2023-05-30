@@ -1,13 +1,20 @@
 import pygame as pg
 import _thread as thread
 import sys
+import moderngl as mgl
+
+import shader
 
 class App:
     def __init__(self, window_dimensions):
-        self.win = pg.display.set_mode(window_dimensions)
+        self.win = pg.display.set_mode(window_dimensions, pg.OPENGL | pg.DOUBLEBUF, vsync=True)
+        shader.Shader.ctx = mgl.create_context()
+        self.display = pg.Surface(window_dimensions)
         self.clock = pg.time.Clock()
         self.fps = 60
         self.running = True
+
+        self.shader = shader.Shader()
 
     def run(self):
         thread.start_new_thread(self._tick, () )
@@ -17,9 +24,20 @@ class App:
                     self.running = False
                 self.handle_event(e)
 
+            self.display.fill((255, 0, 0))
             self.render()
-            self.win.fill((255, 50, 50))
+
+            # Moderngl stuff
+            display_tex = shader.surf2tex(self.display)
+            display_tex.use(0)
+            self.shader.program['tex'] = 0
+            self.shader.renderer.render(mode=mgl.TRIANGLE_STRIP)
+
+            # Switch buffers
             pg.display.flip()
+            
+            display_tex.release()
+
         sys.exit()
 
     def _tick(self):

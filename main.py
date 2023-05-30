@@ -5,8 +5,12 @@ import sys
 sys.path.append('./engine')
 import engine.app as app
 
+class Game (app.App):
+    def __init__(self):
+        app.App.__init__(self, (1024, 600))
+
 if __name__ == '__main__':
-    a = app.App((1024, 600))
+    a = Game()
     a.run()
     sys.exit()
 
