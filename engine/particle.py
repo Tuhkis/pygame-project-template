@@ -19,16 +19,23 @@ class ParticleSystem:
         tex = shader.surf2tex(self.surf, self.s)
         tex.use(1)
         self.s.program['tex'] = 1
+        self.s.program['colour'] = (1.0, 0.5, 0.0)
 
-        self.particles = [[0, 0], [32, 32], [32, 0], [0, 32]]
+        self.particles = []
+        for i in range(1000):
+            self.add_particle(i * 34, 200)
+
+    def add_particle(self, x, y):
+        self.particles.append([x, y, 32, -64])
 
     def tick(self, dt):
         for p in self.particles:
-            p[0] += 32 * dt
+            p[0] += p[2] * dt
+            p[1] += p[3] * dt
+            p[3] += 128 * dt
 
     def render(self):
         for p in self.particles:
-            self.s.program['particlePos'] = p
-            self.s.program['colour'] = (1.0, 0.5, 0.0)
+            self.s.program['particlePos'] = (p[0], p[1])
             self.s.renderer.render(mode=mgl.TRIANGLE_STRIP)
 
