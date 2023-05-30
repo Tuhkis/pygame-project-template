@@ -1,5 +1,6 @@
 import moderngl as mgl
 import pygame as pg
+import array
 
 import shader
 
@@ -21,21 +22,33 @@ class ParticleSystem:
         self.s.program['tex'] = 1
         self.s.program['colour'] = (1.0, 0.5, 0.0)
 
-        self.particles = []
-        for i in range(1000):
-            self.add_particle(i * 34, 200)
+        self.quad=[
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, -1.0,
+            0.0, 0.0, 1.0, -1.0,
+        ]
+        self.quad_buffer = self.s.ctx.buffer(data=array.array('f', self.quad))
+        self.s.renderer = self.s.ctx.vertex_array(self.s.program, [(self.quad_buffer, '2f 2f', 'vert', 'texCoord')])
+        for x in range(1):
+            for y in range(100):
+                self.add_particle(x*32, y*32)
 
     def add_particle(self, x, y):
-        self.particles.append([x, y, 32, -64])
+        for i in [
+            x, y, 0.0, 0.0,
+            x + 32.0, y, 1.0, 0.0,
+            x, y + 32.0, 0.0, -1.0,
+            x + 32.0, y + 32.0, 1.0, -1.0,
+            ]:
+            self.quad.append(i)
+        self.quad_buffer = self.s.ctx.buffer(data=array.array('f', self.quad))
+        self.s.renderer = self.s.ctx.vertex_array(self.s.program, [(self.quad_buffer, '2f 2f', 'vert', 'texCoord')])
 
     def tick(self, dt):
-        for p in self.particles:
-            p[0] += p[2] * dt
-            p[1] += p[3] * dt
-            p[3] += 128 * dt
+        pass
 
     def render(self):
-        for p in self.particles:
-            self.s.program['particlePos'] = (p[0], p[1])
-            self.s.renderer.render(mode=mgl.TRIANGLE_STRIP)
+        for i in range(int(len(self.quad) / 4)):
+            self.s.renderer.render(mode=mgl.TRIANGLE_STRIP, first=i*4, vertices=4)
 
