@@ -8,9 +8,9 @@ import shader
 class App:
     def __init__(self, window_dimensions):
         self.win = pg.display.set_mode(window_dimensions, pg.OPENGL | pg.DOUBLEBUF, vsync=True)
-        shader.Shader.ctx = mgl.create_context()
         self.display = pg.Surface(window_dimensions)
         self.clock = pg.time.Clock()
+        self.rclock = pg.time.Clock()
         self.fps = 60
         self.running = True
 
@@ -28,15 +28,18 @@ class App:
             self.render()
 
             # Moderngl stuff
-            display_tex = shader.surf2tex(self.display)
+            display_tex = shader.surf2tex(self.display, self.shader)
             display_tex.use(0)
             self.shader.program['tex'] = 0
             self.shader.renderer.render(mode=mgl.TRIANGLE_STRIP)
+            self.after_render()
 
             # Switch buffers
             pg.display.flip()
             
             display_tex.release()
+
+            self.rclock.tick(30)
 
         sys.exit()
 
@@ -54,6 +57,9 @@ class App:
         pass
 
     def render(self):
+        pass
+
+    def after_render(self):
         pass
 
     def load_res(self):
