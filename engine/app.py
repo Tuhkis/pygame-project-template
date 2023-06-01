@@ -7,7 +7,7 @@ import shader
 
 class App:
     def __init__(self, window_dimensions):
-        self.win = pg.display.set_mode(window_dimensions, pg.OPENGL | pg.DOUBLEBUF, vsync=True)
+        self.win = pg.display.set_mode(window_dimensions, pg.OPENGL | pg.DOUBLEBUF)
         self.display = pg.Surface(window_dimensions)
         self.clock = pg.time.Clock()
         self.rclock = pg.time.Clock()
@@ -39,7 +39,7 @@ class App:
             
             display_tex.release()
 
-            self.rclock.tick(30)
+            self.rclock.tick(60)
 
         sys.exit()
 
